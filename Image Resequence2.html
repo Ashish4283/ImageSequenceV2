@@ -141,25 +141,48 @@
 let currentImageIndex = 0;
 const images = [];
 
+
+If the issue persists even after updating the onload event handler for the modal image, there might be another factor contributing to the problem. Let's explore a few additional potential causes and solutions:
+
+Cache Issues: Sometimes browsers cache images, and the onload event might not fire for cached images. To ensure the onload event is always triggered, you can modify the image source only after attaching the onload event handler.
+
+Asynchronous Loading: If the image is already loaded before the onload handler is set, the handler won't be triggered. We can check if the image is already loaded and handle it accordingly.
+
+Error Handling: Adding an onerror event to the image might help in understanding if there's an issue with loading the image.
+
+Here's an updated version of the relevant parts of your script with these considerations:
+
+javascript
+Copy code
 function openModal(imageSrc) {
   const modal = document.getElementById('imageModal');
   const modalImage = document.getElementById('modalImage');
   const modalLoadingSpinner = document.getElementById('modalLoadingSpinner');
   
-  modalImage.style.display = 'none';
-  modalLoadingSpinner.style.display = 'block';
-  
-  modalImage.src = imageSrc;
-  currentImageIndex = images.indexOf(imageSrc); // Find the index of the clicked image
-  modal.style.display = 'flex';
-  updateNavButtons();
-
-  modalImage.onload = () => { // Set the onload event
+  modalImage.onload = () => {
     modalLoadingSpinner.style.display = 'none';
     modalImage.style.display = 'block';
   };
-}
 
+  modalImage.onerror = () => {
+    console.error('Error loading image:', imageSrc);
+    modalLoadingSpinner.style.display = 'none';
+  };
+  
+  modalImage.style.display = 'none';
+  modalLoadingSpinner.style.display = 'block';
+  modalImage.src = imageSrc; // Set source after setting onload and onerror
+
+  currentImageIndex = images.indexOf(imageSrc);
+  modal.style.display = 'flex';
+  updateNavButtons();
+
+  // Check if the image is already loaded
+  if (modalImage.complete && modalImage.naturalHeight !== 0) {
+    modalImage.onload();
+  }
+}
+  
 function showPreviousImageInModal() {
   currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
   updateModalImage();
@@ -174,19 +197,28 @@ function updateModalImage() {
   const modalImage = document.getElementById('modalImage');
   const modalLoadingSpinner = document.getElementById('modalLoadingSpinner');
   
-  modalImage.style.display = 'none';
-  modalLoadingSpinner.style.display = 'block';
-  
-  modalImage.src = images[currentImageIndex];
-  
-  modalImage.onload = () => { // Ensure onload event is set here as well
+  modalImage.onload = () => {
     modalLoadingSpinner.style.display = 'none';
     modalImage.style.display = 'block';
   };
+
+  modalImage.onerror = () => {
+    console.error('Error loading image:', images[currentImageIndex]);
+    modalLoadingSpinner.style.display = 'none';
+  };
+
+  modalImage.style.display = 'none';
+  modalLoadingSpinner.style.display = 'block';
+  modalImage.src = images[currentImageIndex];
+
+  // Check if the image is already loaded
+  if (modalImage.complete && modalImage.naturalHeight !== 0) {
+    modalImage.onload();
+  }
   
   updateNavButtons();
 }
-
+  
 function updateNavButtons() {
   const prevButton = document.getElementById('prevImageButton');
   const nextButton = document.getElementById('nextImageButton');
