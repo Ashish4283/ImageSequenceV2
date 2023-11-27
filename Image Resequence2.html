@@ -158,12 +158,22 @@ function openModal(imageSrc) {
   modalLoadingSpinner.style.display = 'block';
   modalImage.style.display = 'none';
 
-  modalImage.src = ''; // Clear previous image
-  modalImage.src = imageSrc;
+  setTimeout(() => {
+    modalImage.src = ''; // Clear previous image
+    modalImage.src = imageSrc;
+  }, 100); // Delay setting the image source slightly
 
   currentImageIndex = images.indexOf(imageSrc);
   updateNavButtons();
 }
+
+document.getElementById('modalImage').onload = () => {
+  const modalLoadingSpinner = document.getElementById('modalLoadingSpinner');
+  const modalImage = document.getElementById('modalImage');
+
+  modalLoadingSpinner.style.display = 'none';
+  modalImage.style.display = 'block';
+};
 ////////////////////////////////////////////////
  function updateModalImage() {
   const modalImage = document.getElementById('modalImage');
