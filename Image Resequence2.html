@@ -153,6 +153,11 @@ function openModal(imageSrc) {
   currentImageIndex = images.indexOf(imageSrc); // Find the index of the clicked image
   modal.style.display = 'flex';
   updateNavButtons();
+
+  modalImage.onload = () => { // Set the onload event
+    modalLoadingSpinner.style.display = 'none';
+    modalImage.style.display = 'block';
+  };
 }
 
 function showPreviousImageInModal() {
@@ -174,7 +179,7 @@ function updateModalImage() {
   
   modalImage.src = images[currentImageIndex];
   
-  modalImage.onload = () => {
+  modalImage.onload = () => { // Ensure onload event is set here as well
     modalLoadingSpinner.style.display = 'none';
     modalImage.style.display = 'block';
   };
