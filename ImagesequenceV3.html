@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  .image-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+  .image-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative; /* Added for positioning the loading spinner */
+  }
+  #linkList {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  /* Magnifier styles */
+  .magnifier {
+    position: absolute;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    pointer-events: none;
+    display: none;
+    background-color: rgba(255, 255, 255, 0.8);
+    overflow: hidden;
+  }
+
+  .magnifier img {
+    width: 200%; /* Adjust this value for the desired magnification level */
+    height: 200%; /* Adjust this value for the desired magnification level */
+    position: absolute;
+    top: -50%; /* Center the magnified image */
+    left: -50%; /* Center the magnified image */
+  }
+
+  /* Modal styles */
+  #imageModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    justify-content: center;
+    align-items: center;
+  }
+
+  #modalImageContainer {
+    position: relative;
+  }
+
+  #modalLoadingSpinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 4px solid rgba(0, 0, 0, 0.3);
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+  }
+
+  #modalImage {
+    max-width: 80%;
+    max-height: 80%;
+  }
+  
+  /* Added styles for navigation buttons */
+  #prevImageButton, #nextImageButton {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 5px;
+  }
+
+  /* Loading indicator styles */
+  .loading-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 4px solid rgba(0, 0, 0, 0.3);
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+    </style>
+</head>
+<body>
+
+ <h1>Image Resequencer</h1>
+    <label for="links">Enter Image Links (separated by commas or new lines):</label>
+    <textarea id="links" rows="4" cols="50"></textarea>
+    <button onclick="showImages()">Show Images</button>
+    
+    <div id="imageContainer" class="image-container"></div>
+    
+    <h2>Adjust Image Sequence</h2>
+    <p>Enter the new sequence number for each image:</p>
+    <div id="sequenceInputs"></div>
+    <button onclick="resequenceImages()">Apply New Sequence</button>
+    
+    <h2>Image Link List</h2>
+    <ul id="linkList"></ul>
+    
+    <!-- New Text Area for Google Sheets Sequence -->
+    <h2>New Sequence for Google Sheets</h2>
+    <textarea id="sequenceForSheet" rows="2" cols="50" readonly></textarea>
+    
+    <!-- Modal for Zoomed Image -->
+    <div id="imageModal">
+    <button id="closeModalButton" onclick="closeModal()">Close</button>
+    <button id="prevImageButton" onclick="showPreviousImageInModal()">Previous</button>
+    <div id="modalImageContainer">
+      <div id="modalLoadingSpinner" class="loading-spinner"></div>
+      <img id="modalImage" src="" alt="Zoomed Image">
+    </div>
+    <button id="nextImageButton" onclick="showNextImageInModal()">Next</button>
+    <button id="rotateImageButton" onclick="rotateImage()">Rotate</button>
+  </div>
+  <script>
+  let currentImageIndex = 0;
+  const images = [];
+  
+  function preloadImages() {
+    images.forEach(imageSrc => {
+      const img = new Image();
+      img.src = imageSrc;
+    });
+  }
+  ///////////////////////////////
+    
+  function openModal(imageSrc) {
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    const modalLoadingSpinner = document.getElementById('modalLoadingSpinner');
+    
+    modal.style.display = 'flex';
+    modalLoadingSpinner.style.display = 'block';
+    modalImage.style.display = 'none';
+  
+    setTimeout(() => {
+      modalImage.src = ''; // Clear previous image
+      modalImage.src = imageSrc;
+    }, 100); // Delay setting the image source slightly
+  
+    currentImageIndex = images.indexOf(imageSrc);
+    updateNavButtons();
+  }
+  
+  document.getElementById('modalImage').onload = () => {
+    const modalLoadingSpinner = document.getElementById('modalLoadingSpinner');
+    const modalImage = document.getElementById('modalImage');
+  
+    modalLoadingSpinner.style.display = 'none';
+    modalImage.style.display = 'block';
+  };
+  ////////////////////////////////////////////////
+   function updateModalImage() {
+    const modalImage = document.getElementById('modalImage');
+    const modalLoadingSpinner = document.getElementById('modalLoadingSpinner');
+  
+    modalLoadingSpinner.style.display = 'block';
+    modalImage.style.display = 'none';
+  
+    modalImage.src = ''; // Clear previous image
+    modalImage.src = images[currentImageIndex];
+  
+    updateNavButtons();
+  }
+  
+  document.getElementById('modalImage').onload = () => {
+    const modalLoadingSpinner = document.getElementById('modalLoadingSpinner');
+    const modalImage = document.getElementById('modalImage');
+  
+    modalLoadingSpinner.style.display = 'none';
+    modalImage.style.display = 'block';
+  };
+  
+  //////////////////////////////
+    
+  function showPreviousImageInModal() {
+    currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
+    updateModalImage();
+  }
+  /////////////////////////////
+  
+  function showNextImageInModal() {
+    currentImageIndex = (currentImageIndex + 1) % images.length;
+    updateModalImage();
+  }
+  //////////////////////////////
+  function updateNavButtons() {
+    const prevButton = document.getElementById('prevImageButton');
+    const nextButton = document.getElementById('nextImageButton');
+    prevButton.disabled = images.length <= 1;
+    nextButton.disabled = images.length <= 1;
+  }
+  /////////////////////////////
+    
+  function showImages() {
+    const linksInput = document.getElementById('links');
+    const imageContainer = document.getElementById('imageContainer');
+    imageContainer.innerHTML = '';
+  
+    const links = linksInput.value.split(/[\s,]+/).map(link => link.trim());
+  
+    links.forEach((link, index) => {
+      if (link !== '') {
+        const imageBox = document.createElement('div');
+        imageBox.className = 'image-box';
+  
+        // Create a loading spinner
+        const loadingSpinner = document.createElement('div');
+        loadingSpinner.className = 'loading-spinner';
+        imageBox.appendChild(loadingSpinner);
+  
+        const img = document.createElement('img');
+        img.src = link;
+        img.alt = `Image ${index + 1}`;
+        img.style.maxWidth = '200px';
+        img.style.maxHeight = '200px';
+  
+        img.onload = () => {
+          // Hide the loading spinner when the image is loaded
+          loadingSpinner.style.display = 'none';
+        };
+  
+        const sequenceInput = document.createElement('input');
+        sequenceInput.type = 'number';
+        sequenceInput.min = '1';
+        sequenceInput.value = index + 1;
+  
+        imageBox.appendChild(img);
+        imageBox.appendChild(sequenceInput);
+        imageContainer.appendChild(imageBox);
+  
+        img.addEventListener('click', () => openModal(link)); // Open the original image in the modal
+        images.push(link); // Store the original image URLs in the images array
+      }
+    });
+  }
+  
+  function resequenceImages() {
+    const imageBoxes = Array.from(document.querySelectorAll('.image-box'));
+    const linkList = document.getElementById('linkList');
+    const sequenceForSheet = document.getElementById('sequenceForSheet');
+    linkList.innerHTML = '';
+    sequenceForSheet.value = ''; // Clear previous sequence
+
+    const sortedImageBoxes = imageBoxes.sort((a, b) => {
+        const aSequenceInput = a.querySelector('input[type="number"]');
+        const bSequenceInput = b.querySelector('input[type="number"]');
+        const aSequenceNumber = parseInt(aSequenceInput.value, 10);
+        const bSequenceNumber = parseInt(bSequenceInput.value, 10);
+        return aSequenceNumber - bSequenceNumber;
+    });
+
+    const sequenceArray = [];
+    sortedImageBoxes.forEach((imageBox, index) => {
+        const imgSrc = imageBox.querySelector('img').src;
+        const listItem = document.createElement('li');
+        listItem.textContent = imgSrc;
+        linkList.appendChild(listItem);
+
+        sequenceArray.push(`${index + 1}\t${imgSrc}`); // Adding sequence number and image URL
+    });
+
+    sequenceForSheet.value = sequenceArray.join('\n'); // Joining array with newline for each entry
+}
+  
+  function closeModal() {
+    const modal = document.getElementById('imageModal');
+    modal.style.display = 'none';
+  }
+  
+  let rotationAngle = 0;
+  
+  function rotateImage() {
+    rotationAngle += 90;
+    const modalImage = document.getElementById('modalImage');
+    modalImage.style.transform = `rotate(${rotationAngle}deg)`;
+  }
+  
+  // Initial display of images
+  showImages();
+  </script>
+  
+  </body>
+  </html> 
+
+
+
