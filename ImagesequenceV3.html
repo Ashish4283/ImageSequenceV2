@@ -2,6 +2,66 @@
 <html>
 <head>
 <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        h1, h2 {
+            color: #444;
+        }
+
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .image-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        #linkList {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
   .image-container {
     display: flex;
     flex-wrap: wrap;
@@ -108,25 +168,27 @@
 </head>
 <body>
 
- <h1>Image Resequencer</h1>
+<div class="container">
+    <h1>Image Resequencer</h1>
     <label for="links">Enter Image Links (separated by commas or new lines):</label>
-    <textarea id="links" rows="4" cols="50"></textarea>
+    <textarea id="links" rows="4"></textarea>
     <button onclick="showImages()">Show Images</button>
-    
+
     <div id="imageContainer" class="image-container"></div>
-    
+
     <h2>Adjust Image Sequence</h2>
-    <p>Enter the new sequence number for each image:</p>
+    <p><B>Note:</B> Enter the Correct sequence number for each image</p>
     <div id="sequenceInputs"></div>
     <button onclick="resequenceImages()">Apply New Sequence</button>
-    
-    <h2>Image Link List</h2>
+
+    <h2></h2>
     <ul id="linkList"></ul>
-    
+
     <!-- New Text Area for Google Sheets Sequence -->
     <h2>New Sequence for Google Sheets</h2>
-    <textarea id="sequenceForSheet" rows="2" cols="50" readonly></textarea>
+    <textarea id="sequenceForSheet" rows="2" readonly></textarea>
     <button onclick="copyToClipboard()">Copy to Clipboard</button>
+</div>
     
     <!-- Modal for Zoomed Image -->
     <div id="imageModal">
