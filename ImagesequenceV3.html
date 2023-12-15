@@ -39,37 +39,15 @@
         #linkList {
             list-style-type: none;
             padding: 0;
-	
         }
 
-.border-effect {
-    position: relative;
-    margin-bottom: 15px;
-    padding: 2px;
-    background: linear-gradient(270deg, #4CAF50, #81C784, #66BB6A, #4CAF50);
-    background-size: 400% 400%;
-    animation: borderFlow 8s ease infinite;
-    border-radius: 6px;
-}
-
-textarea, input[type="number"] {
-    display: block;
-    width: calc(80% - 4px); /* Adjust for padding */
-    height: 80px;
-    padding: 10px;
-    margin: 0; /* Remove default margin */
-    border-radius: 4px;
-    border: none; /* Remove default border */
-    background-color: white;
-}
-
-@keyframes borderFlow {
-    0% { background-position: 0% 50%; }
-    100% { background-position: 100% 50%; }
-}
-
-
-
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
 
         button {
             background-color: #3498db;
@@ -189,42 +167,29 @@ textarea, input[type="number"] {
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Image Resequencer</h1>
-        <label for="links">Enter Image Links (separated by commas or new lines):</label>
-	 <div class="border-effect">
-        	<textarea id="links" rows="4"></textarea>
-	 </div>
 
-        <button onclick="showImages()">Show Images</button>
-        <div id="imageContainer" class="image-container"></div>
+<div class="container">
+    <h1>Image Resequencer</h1>
+    <label for="links">Copy Paste the Image Links:</label>
+    <textarea id="links" rows="4"></textarea>
+    <button onclick="showImages()">Show Images</button>
 
-        <h2>Adjust Image Sequence</h2>
-        <p><strong>Note:</strong> Enter the Correct sequence number for each image</p>
-        <div id="sequenceInputs"></div>
-        <button onclick="resequenceImages()">Apply New Sequence</button>
+    <div id="imageContainer" class="image-container"></div>
 
-        <ul id="linkList"></ul>
+    <h2>Adjust Image Sequence</h2>
+    <p><B>Note:</B> Enter the Correct sequence number for each image</p>
+    <div id="sequenceInputs"></div>
+    <button onclick="resequenceImages()">Apply New Sequence</button>
 
-        <!-- New Text Area for Google Sheets Sequence -->
-        <h2>New Sequence for Google Sheets</h2>
-    <div class="border-effect">
-        <textarea id="sequenceForSheet" rows="2" readonly></textarea>
-    </div>
-        <button onclick="copyToClipboard()">Copy to Clipboard</button>
-        
-        <!-- Modal for Zoomed Image -->
-        <div id="imageModal">
-            <button id="closeModalButton" onclick="close modal()">Close</button>
-            <button id="prevImageButton" onclick="showPreviousImageInModal()">Previous</button>
-            <div id="modalImageContainer">
-                <div id="modalLoadingSpinner" class="loading-spinner"></div>
-                <img id="modalImage" src="" alt="Zoomed Image">
-            </div>
-            <button id="nextImageButton" onclick="showNextImageInModal()">Next</button>
-            <button id="rotateImageButton" onclick="rotateImage()">Rotate</button>
-        </div>
-    </div>
+    <h2></h2>
+    <ul id="linkList"></ul>
+
+    <!-- New Text Area for Google Sheets Sequence -->
+    <h2>New Sequence for Google Sheets</h2>
+    <textarea id="sequenceForSheet" rows="2" readonly></textarea>
+    <button onclick="copyToClipboard()">Copy to Clipboard</button>
+</div>
+    
     <!-- Modal for Zoomed Image -->
     <div id="imageModal">
     <button id="closeModalButton" onclick="closeModal()">Close</button>
