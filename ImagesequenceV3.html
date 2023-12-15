@@ -126,6 +126,7 @@
     <!-- New Text Area for Google Sheets Sequence -->
     <h2>New Sequence for Google Sheets</h2>
     <textarea id="sequenceForSheet" rows="2" cols="50" readonly></textarea>
+    <button onclick="copyToClipboard()">Copy to Clipboard</button>
     
     <!-- Modal for Zoomed Image -->
     <div id="imageModal">
@@ -261,33 +262,30 @@
     });
   }
   
-  function resequenceImages() {
-    const imageBoxes = Array.from(document.querySelectorAll('.image-box'));
-    const linkList = document.getElementById('linkList');
-    const sequenceForSheet = document.getElementById('sequenceForSheet');
-    linkList.innerHTML = '';
-    sequenceForSheet.value = ''; // Clear previous sequence
+        function resequenceImages() {
+            const imageBoxes = Array.from(document.querySelectorAll('.image-box'));
+            const linkList = document.getElementById('linkList');
+            const sequenceForSheet = document.getElementById('sequenceForSheet');
+            linkList.innerHTML = '';
+            sequenceForSheet.value = ''; // Clear previous sequence
 
-    const sortedImageBoxes = imageBoxes.sort((a, b) => {
-        const aSequenceInput = a.querySelector('input[type="number"]');
-        const bSequenceInput = b.querySelector('input[type="number"]');
-        const aSequenceNumber = parseInt(aSequenceInput.value, 10);
-        const bSequenceNumber = parseInt(bSequenceInput.value, 10);
-        return aSequenceNumber - bSequenceNumber;
-    });
+            imageBoxes.sort((a, b) => {
+                const aSequenceInput = a.querySelector('input[type="number"]');
+                const bSequenceInput = b.querySelector('input[type="number"]');
+                const aSequenceNumber = parseInt(aSequenceInput.value, 10);
+                const bSequenceNumber = parseInt(bSequenceInput.value, 10);
+                return aSequenceNumber - bSequenceNumber;
+            }).forEach(imageBox => {
+                const imgSrc = imageBox.querySelector('img').src;
+                sequenceForSheet.value += imgSrc + '\t'; // Append image URL with tab separator
+            });
+        }
 
-    const sequenceArray = [];
-    sortedImageBoxes.forEach((imageBox, index) => {
-        const imgSrc = imageBox.querySelector('img').src;
-        const listItem = document.createElement('li');
-        listItem.textContent = imgSrc;
-        linkList.appendChild(listItem);
-
-        sequenceArray.push(`${index + 1}\t${imgSrc}`); // Adding sequence number and image URL
-    });
-
-    sequenceForSheet.value = sequenceArray.join('\n'); // Joining array with newline for each entry
-}
+        function copyToClipboard() {
+            const sequenceForSheet = document.getElementById('sequenceForSheet');
+            sequenceForSheet.select();
+            document.execCommand('copy');
+        }
   
   function closeModal() {
     const modal = document.getElementById('imageModal');
@@ -308,6 +306,3 @@
   
   </body>
   </html> 
-
-
-
